@@ -4,13 +4,17 @@ Created on Apr 23, 2017
 @author: Robert Phillips III
 '''
 
+import sys
+
 from PyQt5.QtWidgets import QApplication
 
-from plotwindow import PlotManager
+from plotwindow import QPlotWindow
         
 app = QApplication([])
 
-window = PlotManager()
-window.display()
+window = QPlotWindow()
+window.show()
 
-app.exec_()
+app.aboutToQuit.connect(window.cleanup)
+
+sys.exit(app.exec_())

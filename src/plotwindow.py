@@ -10,7 +10,12 @@ import plotjson
 
 from PyQt5.QtCore import QTimer
 
+from PyQt5.QtWidgets import QApplication
+
+from PyQt5.Qt import QFileDialog
+from PyQt5.Qt import QAction
 from PyQt5.Qt import QWidget
+from PyQt5.Qt import QMainWindow
 from PyQt5.Qt import QHBoxLayout
 
 from plotwidgets import QPlotSideBar
@@ -23,12 +28,16 @@ class PlotManager(QWidget):
         src, spec = plotjson.get_configuration('../config.json')
         
         self.datasrc = src
+        self.datasrc.start()
+        
         self.plots   = [ QRealTimePlot(config) for config in spec.get_plot_specs() ]
         self.active  = []
         
         pg.setConfigOptions(antialias=True)
 
-        self.plotwindow = pg.GraphicsWindow(title=spec.get_title())
+        parent.setWindowTitle(spec.get_title())
+                
+        self.plotwindow = pg.GraphicsWindow()
         
         self.plotconfig = QPlotSideBar(self)
         self.plotconfig.addSources(self.datasrc.get_sources())
@@ -78,10 +87,33 @@ class PlotManager(QWidget):
             self.active[index].remove()
             del self.active[index]
         
+    def save_setup(self, fname):
+        settings = { 'source' : self.datasrc.get_active_source(), 'plots' : [ plot.get_name() for plot in self.active ]}
+        plotjson.write_configuration(fname, settings)
+        
+    def recall_setup(self, fname):
+        self.plotwindow.clear()
+        for plot in self.active:
+            plot.remove()
+            
+        self.active = []
+        
+        src, plots = plotjson.get_recall_settings(fname)
+        for plot in plots:
+            self.add_plot(plot)
+            
+        self.plotconfig.setSource(src)
+        
     def display(self):
         self.datasrc.start()
         
         self.show()
+        
+    def __del__(self):
+        print 'Destroyed'
+        
+    def cleanup(self):
+        self.datasrc.cleanup()
         
     def update(self):
         while self.datasrc.has_sample():        
@@ -91,3 +123,53 @@ class PlotManager(QWidget):
                 for plot in self.active:
                     if plot.get_data_type() == datatype:
                         plot.update(sample)
+                        
+class QPlotWindow(QMainWindow):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        
+        self.window = PlotManager(self)
+        self.setCentralWidget(self.window)
+        
+        self.resize(1000, 600)
+        
+        rect = self.geometry()
+        rect.moveCenter(QApplication.desktop().availableGeometry().center())
+        self.setGeometry(rect)
+    
+        self._init_menu()
+        
+    def _init_menu(self):
+        menu = self.menuBar()
+        filemenu = menu.addMenu('&File')
+        
+        save = QAction('Save Setup', self)
+        save.setShortcut('Ctrl+S')
+        save.triggered.connect(self.save_setup)
+        
+        recall = QAction('Recall Setup', self)
+        recall.setShortcut('Ctrl+R')
+        recall.triggered.connect(self.recall_setup)
+        
+        stop = QAction('Exit', self)
+        stop.triggered.connect(self.exit)
+        
+        filemenu.addAction(save)
+        filemenu.addAction(recall)
+        filemenu.addAction(stop)
+        
+    def save_setup(self):
+        fname = QFileDialog.getSaveFileName(self, caption='Save Setup File', filter='*.set')
+        if fname:
+            self.window.save_setup(str(fname[0]) + '.set')
+            
+    def recall_setup(self):
+        fname = QFileDialog.getOpenFileName(self, caption='Recall Setup File', filter='*.set')
+        if fname:
+            self.window.recall_setup(str(fname[0]))
+            
+    def cleanup(self):
+        self.window.cleanup()
+        
+    def exit(self):
+        pass

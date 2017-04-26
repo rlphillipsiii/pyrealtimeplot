@@ -122,7 +122,34 @@ class DataSrcConfig():
     def get_source(self):
         return self.src
      
-     
+class RecallConfig():
+    SOURCE = 'source'
+    PLOTS = 'plots'
+    
+    def __init__(self, config):
+        self.source = config[RecallConfig.SOURCE]
+        self.plots  = config[RecallConfig.PLOTS]
+    
+    def get_source(self):
+        return self.source
+    
+    def get_plots(self):
+        return self.plots
+        
+def write_configuration(fname, settings):
+    with open(fname, 'w') as f:
+        f.write(json.dumps(settings))
+        
+def get_recall_settings(fname):
+    with open(fname, 'r') as data:
+        config = json.load(data)
+        
+        recalled = RecallConfig(config)
+        
+        return (recalled.get_source(), recalled.get_plots())
+    
+    return None
+
 def get_configuration(fname):    
     with open(fname, 'r') as data:
         config = json.load(data)

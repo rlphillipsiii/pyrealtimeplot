@@ -53,7 +53,7 @@ class DataSource(QThread):
         
         return running
         
-    def stop(self):
+    def cleanup(self):
         self.interrupt()
         
         self.quit()
@@ -67,6 +67,10 @@ class DataSource(QThread):
     def __str__(self):
         raise NotImplementedError('users must define __str__ to use this base class')
         
+    @abc.abstractmethod
+    def get_active_source(self):
+        raise NotImplementedError('users must define get_active_source to use this base class')
+    
     @abc.abstractmethod
     def get_sources(self):
         raise NotImplementedError('users must define get_sources to use this base class')
@@ -167,6 +171,8 @@ class SerialSource(DataSource):
         interrupt = self.get_interrupt_status()
         
         while not interrupt:
+            interrupt = self.get_interrupt_status()
+            
             if self.comm is None:
                 time.sleep(0.001)
                 self._init_comm()
@@ -179,11 +185,9 @@ class SerialSource(DataSource):
                     payload = self.decode_data()
                     
                     self.append_queue(payload)
-                
-                interrupt = self.get_interrupt_status()
             except:
-                import traceback
-                traceback.print_exc()
+                #import traceback
+                #traceback.print_exc()
                 self.clean_serial()
             
     def clean_serial(self):
@@ -200,7 +204,8 @@ class SerialSource(DataSource):
         self.cancel = True
         self.unlock()
         
-        self.comm.cancel_read()
+        if not self.comm is None:
+            self.comm.cancel_read()
         
     def set_source(self, source):
         if not self.comm is None:
@@ -208,11 +213,14 @@ class SerialSource(DataSource):
             
         self.port = source
         
+    def get_active_source(self):
+        return self.port
+    
     def get_sources(self):
         return self.sources
     
     def __str__(self):
-        print 'SerialSource Object'
+        return 'SerialSource Object'
         
         
 class FileSource(DataSource):
@@ -245,6 +253,9 @@ class FileSource(DataSource):
             
         return packet
         
+    def get_active_source(self):
+        return "Default"
+    
     def get_sources(self):
         return [ "Default" ]
         
@@ -255,4 +266,4 @@ class FileSource(DataSource):
         pass
         
     def __str__(self):
-        print 'FileSource Object'
+        return 'FileSource Object'

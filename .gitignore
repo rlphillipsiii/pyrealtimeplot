@@ -1,2 +1,3 @@
 .pydevproject
+*.set
 src/*.pyc

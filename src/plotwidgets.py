@@ -7,15 +7,24 @@ Created on Apr 25, 2017
 import numpy as np
 
 from PyQt5.Qt import QWidget
+from PyQt5.Qt import QFrame
 from PyQt5.Qt import QVBoxLayout
 from PyQt5.Qt import QPushButton
 from PyQt5.Qt import QListWidget
 from PyQt5.Qt import QComboBox
+from PyQt5.Qt import QLabel
 
 from PyQt5.QtCore import Qt
 
+class QHorizontalLine(QFrame):
+    def __init__(self):
+        QFrame.__init__(self)
+        
+        self.setFrameShape(QFrame.HLine)
+        self.setFrameShadow(QFrame.Sunken)
+        
 class QPlotList(QWidget):
-    def __init__(self, btntext, parent=None):
+    def __init__(self, label, btntext, parent=None):
         QWidget.__init__(self, parent=parent)
         
         self.layout = QVBoxLayout()
@@ -29,6 +38,10 @@ class QPlotList(QWidget):
         self.list = QListWidget()
         self.list.currentTextChanged.connect(self.listItemSelected)
         
+        self.label = QLabel()
+        self.label.setText(label)
+        
+        self.layout.addWidget(self.label)
         self.layout.addWidget(self.list)
         self.layout.addWidget(self.btn)
         
@@ -64,21 +77,27 @@ class QPlotSideBar(QWidget):
         
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
+                
+        self.srclabel = QLabel()
+        self.srclabel.setText('Plot Data Source:')
         
         self.datasrc = QComboBox()
         self.datasrc.currentIndexChanged.connect(self.onSourceChanged)
         self.datasrc_callbacks = []
         
-        self.off = QPlotList('Add Plot', self)
+        self.off = QPlotList('Available Plots:', 'Add Plot', self)
         self.off.onClick(self.onAddPlot)
         self.off_callbacks = []
         
-        self.on  = QPlotList('Remove Plot', self)
+        self.on  = QPlotList('Active Plots:', 'Remove Plot', self)
         self.on.onClick(self.onRemovePlot)
         self.on_callbacks = []
         
+        self.layout.addWidget(self.srclabel)
         self.layout.addWidget(self.datasrc)
+        self.layout.addWidget(QHorizontalLine())
         self.layout.addWidget(self.off)
+        self.layout.addWidget(QHorizontalLine())
         self.layout.addWidget(self.on)
         
         self.setLayout(self.layout)
@@ -89,6 +108,15 @@ class QPlotSideBar(QWidget):
     def addSources(self, sources):
         for src in sources:
             self.addSource(src)
+            
+    def setSource(self, source):
+        index = -1
+        for i in range(self.datasrc.count()):
+            if self.datasrc.itemText(i) == source:
+                index = i
+                
+        if index != -1:
+            self.datasrc.setCurrentIndex(index)
             
     def addPlotType(self, ptype):
         self.off.addPlotSelection(ptype)
