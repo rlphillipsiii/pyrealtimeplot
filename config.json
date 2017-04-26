@@ -1,0 +1,48 @@
+{
+    "title" : "Orientation Plot",
+    "period" : "0.005",
+    "reclen" : "1000",
+    "ybounds" : [ "-10", "10" ],
+    "taps" : [ "0.08147998212219136", "0.31103962981825106", "0.44983457995100345", "0.31103962981825106", "0.08147998212219136" ],
+    "plots" : [
+        {
+            "name" : "Filter Roll",
+            "type" : "0x00"
+        },
+        {
+            "name" : "Filter Pitch",
+            "type" : "0x01"
+        }
+    ],
+    "sources" : 
+        { 
+            "active" : "serial",
+            "configurations" : [
+                {
+                    "name" : "serial",
+                    "ports" : [ "COM3", "COM5", "COM6", "COM7" ],
+                    "config" : 
+                        {
+                            "baud" : "115200",
+                            "bytesize" : "8",
+                            "stopbits" : "1",
+                            "parity" : "N"
+                        }
+                },
+                {
+                    "name" : "file",
+                    "config" :
+                        {
+                            "path" : "samples.log",
+                            "mode" : "loop"
+                        }
+                },
+                {
+                    "name" : "socket",
+                    "config" :
+                        {
+                        }
+                }
+            ]
+        }
+}
