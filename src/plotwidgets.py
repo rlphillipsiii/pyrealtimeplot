@@ -164,6 +164,8 @@ class QRealTimePlot(object):
         self.ylimits = spec.get_ybounds()
         self.taps    = spec.get_taps()
         
+        self.defaulton = spec.get_state()
+        
         self.curve  = None
         self.window = None
         
@@ -237,3 +239,6 @@ class QRealTimePlot(object):
     
     def get_name(self):
         return self.name
+    
+    def get_state(self):
+        return self.defaulton

@@ -7,10 +7,12 @@
     "plots" : [
         {
             "name" : "Filter Roll",
+            "state" : "active",
             "type" : "0x00"
         },
         {
             "name" : "Filter Pitch",
+            "state" : "active",
             "type" : "0x01"
         }
     ],

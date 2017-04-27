@@ -48,6 +48,10 @@ class PlotManager(QWidget):
         for plot in self.plots:
             self.plotconfig.addPlotType(plot.get_name())
             
+        for plot in self.plots:
+            if plot.get_state():
+                self.add_plot(plot.get_name())
+                
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.plotwindow)
         self.layout.addWidget(self.plotconfig)

@@ -11,10 +11,13 @@ from plotsource import FileSource
 
 class PlotSpec():
     def __init__(self, config, spec):
-        self.name    = spec[PlotConfig.NAME]
-        self.type    = int(spec[PlotConfig.TYPE], 16)
-        self.period  = float(spec[PlotConfig.PERIOD]) if PlotConfig.PERIOD in spec else float(config[PlotConfig.GLOBAL_PERIOD])
-        self.reclen  = int(spec[PlotConfig.RECLEN]) if PlotConfig.RECLEN in spec else int(config[PlotConfig.GLOBAL_RECLEN])
+        self.name   = spec[PlotConfig.NAME]
+        self.type   = int(spec[PlotConfig.TYPE], 16)
+        self.period = float(spec[PlotConfig.PERIOD]) if PlotConfig.PERIOD in spec else float(config[PlotConfig.GLOBAL_PERIOD])
+        self.reclen = int(spec[PlotConfig.RECLEN]) if PlotConfig.RECLEN in spec else int(config[PlotConfig.GLOBAL_RECLEN])
+        
+        active = spec[PlotConfig.STATE] if PlotConfig.STATE in spec else 'inactive'
+        self.active = (active == 'active')
         
         taps = None
         if PlotConfig.TAPS in spec:
@@ -45,6 +48,9 @@ class PlotSpec():
     def get_taps(self):
         return self.taps
     
+    def get_state(self):
+        return self.active
+    
     
 class PlotConfig():
     TITLE = 'title'
@@ -60,6 +66,7 @@ class PlotConfig():
     RECLEN = 'reclen'
     YBOUNDS = 'ybounds'
     TAPS = 'taps'
+    STATE = 'state'
 
     def __init__(self, config):
         self.title  = config[PlotConfig.TITLE]
