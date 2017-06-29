@@ -1,0 +1,105 @@
+// EVERYTHING IN THIS FILE IS CASE SENSITIVE.
+// NOTE THAT THERE ARE NO COMMENTS IN JSON, BUT FOR EXAMPLE PURPOSES, THE LINES
+// THAT SHOULD BE TAKEN OUT OF THIS FILE IF IT IS TO BE USED AS AN ACTUAL CONFIG
+// FILE ARE PRECEDED BY A C-STYLE COMMENT ("//")
+{
+    // the title of the GUI window
+    "title" : "Orientation Plot",
+    
+    // the gloabl sampling period of the data that is being displayed by the plot
+    "period" : "0.005",
+    
+    // any positive integer number of samples (global) that the plot should display (the x axis bounds are 0 to (period * reclen))
+    "reclen" : "1000", 
+    
+    // the global y axis bounds
+    "ybounds" : [ "-10", "10" ],
+    
+    // filter taps for performing DSP on the sampled data (this feature is currently unused)
+    "taps" : [ "0.08147998212219136", "0.31103962981825106", "0.44983457995100345", "0.31103962981825106", "0.08147998212219136" ],
+    
+    // the plots that are available
+    "plots" : [
+        {
+            // name of the plot
+            "name" : "Filter Roll",
+            
+            // the plot state that determines whether or not the plot is displayed by default ("active" or "inactive")
+            // if this is left out, the state is assumed to be "inactive"
+            "state" : "active",
+            
+            // 8 bit hex value of the form 0xNN that is the type of data that this plot is supposed to display
+            "type" : "0x00",
+            
+            // the plot specific period (defaults to the global period if this is left out)
+            "period" : ".010",
+            
+            // the plot specific reclen (defaults to the global reclen if this is left out)
+            "reclen" : "500",
+            
+            // the plot specific y-axis bounds (defaults to the global ybounds if this is left out)
+            "ybounds" : [ "-.5", ".5" ],
+            
+            // the plot specific filter taps (defaults to the global filter taps if this is left out)
+            "taps" : [ "1", "1", "1" ]
+        },
+        {
+            "name" : "Filter Pitch",
+            "state" : "active",
+            "type" : "0x01"
+        }
+    ],
+    // that configuration for the plot data source
+    "sources" : 
+        { 
+            // the data source that is active (this much match the name of one of the configurations below)
+            "active" : "serial",
+            
+            // the configuration for each type of data source
+            "configurations" : [
+                {
+                    // the name of the data source
+                    "name" : "serial",
+                    
+                    // the serial ports that are available for use
+                    // if left off, the GUI will try to auto-detect the ports that are available, which isn't really working
+                    // on Windows yet, and doesn't work at on all Unix based systems
+                    "ports" : [ "COM3", "COM5", "COM6", "COM7" ],
+                    
+                    // the actual serial configuration
+                    "config" : 
+                        {
+                            // serial baud rate
+                            "baud" : "115200",
+                            
+                            // the serial bytesize, which must be 6, 7, or 8
+                            "bytesize" : "8",
+                            
+                            // the number of stop bits, which must be 1, 1.5, or 2
+                            "stopbits" : "1",
+                            
+                            // the parity type, which must be N for none, E for even, O for odd, M for mark, or S for space
+                            "parity" : "N"
+                        }
+                },
+                {
+                    "name" : "file",
+                    "config" :
+                        {
+                            // file path for the file that shows the data to be plotted
+                            "path" : "samples.log",
+                            
+                            // how the file data is handled, which only supports "loop" at the moment, which means that
+                            // the data will get looped back around to the beginning when the end of the file is reached
+                            "mode" : "loop"
+                        }
+                },
+                {
+                    "name" : "socket",
+                    "config" :
+                        {
+                        }
+                }
+            ]
+        }
+}

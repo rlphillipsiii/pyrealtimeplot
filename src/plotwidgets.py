@@ -52,8 +52,7 @@ class QPlotList(QWidget):
         self.selected = label
         
     def forwardClickEvt(self):
-        #if self.selected is None or self.btnclicked is None:
-        if self.btnclicked is None:
+        if self.selected is None or self.btnclicked is None:
             return
         
         self.btnclicked(self.selected)
@@ -89,7 +88,7 @@ class QPlotSideBar(QWidget):
         self.off.onClick(self.onAddPlot)
         self.off_callbacks = []
         
-        self.on  = QPlotList('Active Plots:', 'Remove Plot', self)
+        self.on = QPlotList('Active Plots:', 'Remove Plot', self)
         self.on.onClick(self.onRemovePlot)
         self.on_callbacks = []
         

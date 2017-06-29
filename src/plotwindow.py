@@ -113,9 +113,6 @@ class PlotManager(QWidget):
         
         self.show()
         
-    def __del__(self):
-        print 'Destroyed'
-        
     def cleanup(self):
         self.datasrc.cleanup()
         
